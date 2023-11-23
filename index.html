@@ -1,0 +1,400 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Chat</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #chat-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        #sidebar {
+            flex: 1;
+            background-color: #128C7E;
+            color: #fff;
+            padding: 20px;
+            overflow-y: auto;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        #main-content {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #messages {
+            flex: 1;
+            list-style-type: none;
+            padding: 10px;
+            margin: 0;
+            overflow-y: auto;
+            word-wrap: break-word;
+        }
+
+        #form {
+            display: flex;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #ccc;
+        }
+
+        #m {
+            flex: 1;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        #send-btn {
+            padding: 8px;
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+            background-color: #128C7E;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .message-container {
+            margin-bottom: 10px;
+        }
+
+        .message-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Styling for the name input modal */
+        #name-modal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        #name-modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #name-input {
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #submit-name-btn {
+            padding: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #128C7E;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+        }
+
+         #course-details {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 600px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        #close-btn {
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #close-btn:hover {
+            background-color: #555;
+        }
+
+        #instructor-details {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #user-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .user-list-item {
+            margin-bottom: 5px;
+        }
+
+        /* Add these styles to your existing styles */
+
+/* Add these styles to your existing styles */
+
+/* Add these styles to your existing styles */
+
+/* Add this style to your existing styles */
+
+.message-container {
+    margin-bottom: 10px;
+    overflow: hidden; /* Clear the float */
+    border: 1px solid #ccc; /* Border for the message container */
+    border-radius: 5px; /* Rounded corners for the message container */
+    max-width: 50%;
+    padding: 10px; /* Padding inside the message container */
+    margin-left: auto; /* Auto margin on the left to push it to the right */
+    clear: both; /* Ensure each message container starts on a new line */
+}
+
+/* The rest of your existing styles */
+
+
+.message-right {
+    text-align: right;
+    background-color: #128C7E; /* Background color for current user's messages */
+    color: #fff; /* Text color for current user's messages */
+    float: right; /* Float the right-aligned messages to the right */
+}
+
+.message-left {
+    text-align: left;
+    background-color: #f0f0f0; /* Background color for other users' messages */
+    float: left; /* Float the left-aligned messages to the left */
+}
+
+.message-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.message-right .message-name {
+    color: #fff; /* Color for current user's name in right-aligned messages */
+}
+
+.message-left .message-name {
+    color: #333; /* Color for other users' names in left-aligned messages */
+}
+
+/* Add any other styling as needed */
+
+/* Add any other styling as needed */
+
+/* Add any other styling as needed */
+
+    </style>
+</head>
+<body>
+    <!-- Name input modal -->
+    <div id="name-modal">
+        <div id="name-modal-content">
+            <label for="name-input">Please enter your name:</label>
+            <input type="text" id="name-input" />
+            <button id="submit-name-btn">Submit</button>
+        </div>
+    </div>
+    <div id="course-details">
+        <p id="course-description"></p>
+        <button id="close-btn">Close</button>
+    </div>
+ 
+
+
+    <div id="chat-container">
+        <div id="sidebar">
+           
+            <h3>Courses</h3>
+            <ul id="courses">
+              <li data-course="intermediate-programming">Intermediate Programming and Data Structures</li>
+              <!-- Add more courses as needed -->
+            </ul>
+          </div> 
+        <div id="main-content">
+            <ul id="messages"></ul>
+            <form id="form" action="">
+                <input id="m" autocomplete="off" placeholder="Type a message..." />
+                <button id="send-btn">Send</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+        let userName;
+
+        // Function to show the name input modal
+        function showNameModal() {
+            const nameModal = document.getElementById('name-modal');
+            nameModal.style.display = 'flex';
+        }
+
+        // Function to hide the name input modal
+        function hideNameModal() {
+            const nameModal = document.getElementById('name-modal');
+            nameModal.style.display = 'none';
+        }
+
+        // ...
+
+        // Event listener for the name input form submission
+        document.getElementById('submit-name-btn').addEventListener('click', function () {
+            const nameInput = document.getElementById('name-input');
+            userName = nameInput.value.trim();
+
+            if (userName !== '') {
+                hideNameModal(); // Hide the modal if a name is provided
+                socket.emit('new user', userName); // Notify the server about the new user
+            } else {
+                alert('Please enter a valid name.');
+            }
+        });
+
+        // ...
+
+
+        // Show the name input modal when the page loads
+        showNameModal();
+
+        const form = document.querySelector('#form');
+        const input = document.querySelector('#m');
+        const messages = document.querySelector('#messages');
+        const onlineUsers = document.querySelector('#online-users');
+        const sidebar = document.querySelector('#sidebar');
+        // ...
+
+const courses = document.getElementById('courses');
+
+// Event listener for course item click
+courses.addEventListener('click', function (e) {
+    const courseName = e.target.dataset.course;
+
+    // Check if a course name is associated with the clicked element
+    if (courseName) {
+        // Show course details based on the clicked course
+        showCourseDetails(courseName);
+    }
+});
+
+function showCourseDetails(courseName) {
+    // Replace this alert with your desired way of displaying course details
+    alert(getCourseDetails(courseName));
+}
+
+function getCourseDetails(courseName) {
+    // Add more courses and their details as needed
+    if (courseName === 'intermediate-programming') {
+        return `Course: Intermediate Programming and Data Structures\n\nThe course is designed to give students a foundation of the principles underlying programming practice. Starting with an introduction around binary systems and an exploration of the relationship between computer’s hardware and its instruction set (the level at which a program is understood by a computer), the curious student is guided through a series of activities requiring deep thinking to enable understanding the various ways in which data can be processed (algorithms) to produce intended outcomes. Furthermore, the student is given a first-hand feel of the costs involved in processing data which depend on the way in which data is organized and stored while being processed, such as in an array, dictionary, linked list, and binary tree, for example. The activities have been so planned as to give students a glimpse into how data structures play a role in the efficient organization and manipulation of data to achieve intended outcomes. The learning activities culminate in a project that not only challenges the student but also enthuses and nudges the student on the way to acquiring the skills required for discerning and tackling business process-related issues related to efficiency, efficacy, and costs. \n Instructor - Shubham Bajpai \n Teaching Fellow - Nithya S Satish`;
+    }
+
+    // Add more cases for additional courses
+
+    // Default case if the course details are not found
+    return 'Course details not found.';
+}
+function showCourseDetails(courseName) {
+            const courseDescription = getCourseDetails(courseName);
+            document.getElementById('course-description').textContent = courseDescription;
+            document.getElementById('course-details').style.display = 'block';
+        }
+
+        document.getElementById('close-btn').addEventListener('click', function () {
+            document.getElementById('course-details').style.display = 'none';
+        });
+
+// ...
+    
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (input.value.trim() !== '') {
+                const message = `${userName}: ${input.value}`;
+                socket.emit('chat message', message);
+                input.value = '';
+            }
+        });
+
+       // ...
+
+// ...
+
+socket.on('chat message', function (msg) {
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('message-container');
+
+    const messageName = document.createElement('div');
+    messageName.classList.add('message-name');
+
+    // Extract user name and message
+    const [name, messageText] = msg.split(': ');
+
+    // Set different classes for the message containers
+    if (name === userName) {
+        messageContainer.classList.add('message-right'); // Class for the current user's messages
+    } else {
+        messageContainer.classList.add('message-left'); // Class for other users' messages
+    }
+
+    messageName.textContent = name;
+
+    const messageTextElement = document.createElement('div');
+    messageTextElement.textContent = messageText;
+
+    messageContainer.appendChild(messageName);
+    messageContainer.appendChild(messageTextElement);
+
+    messages.appendChild(messageContainer);
+});
+
+// ...
+
+
+// ...
+
+            // Toggle the sidebar based on whether there are online users
+            sidebar.style.width = users.length > 0 ? 'auto' : '0';
+        
+
+
+    </script>
+</body>
+</html>
